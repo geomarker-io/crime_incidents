@@ -5,6 +5,7 @@ This R code creates the `crime incidents` data resource. The crime incidents dat
 The "x_address" provided by the city is converted to possible street range lines from the census bureau using text matching for street names and comparison of street number ranges.  It is possible for an "x_address" range to have more than one intersection census street range file, which are stored in the `street_ranges` list-col, alongside the `address_x`, `date_time`, `INSTANCEID`, `INCIDENT_NO` and three offense category columns. 94% (n=332,709) of all 353,449 records were matched to at least one census street range geography.
 
 Below is a map of the total number of shots detected in each street range approximation in Avondale, East Price Hill, and West Price Hill:
+
 ![crime_incident_map](https://user-images.githubusercontent.com/104022087/214564265-d33bdc73-b583-4db3-9cec-f9500456b389.svg)
 
 Note that in this dataset, each crime incident record is uniquely identified by `INSTANCEID`, but `INCIDENT_NO` may be mapped to multiple `INSTANCEID`. 
