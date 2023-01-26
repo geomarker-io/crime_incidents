@@ -2,7 +2,7 @@ library(sf)
 library(dplyr)
 library(ggplot2)
 
-d <- readRDS(sprintf("data/crime_incidents_street_ranges_%s.rds", Sys.Date()))
+d <- readRDS("data/crime_incidents_street_ranges.rds")
 
 d <- d |>
   filter(!is.na(street_ranges)) |>
@@ -16,16 +16,8 @@ d <- d |>
 
 mapview::mapview(filter(d, n > 5), zcol = "n")
 
-
 neigh <-
-  cincy::neigh_cchmc_2020 |>
-  filter(neighborhood %in% c("Avondale", "E. Price Hill", "W. Price Hill"))
-
-d <-
-  d |>
-  st_transform(st_crs(neigh)) |>
-  st_crop(neigh)
-
+  cincy::neigh_cchmc_2020 
 
 the_roads <-
   tigris::roads(state = "39", county = "061") |>
@@ -35,8 +27,10 @@ the_roads <-
 
 ggplot(d) +
   geom_sf(aes(linetype = MTFCC), data = the_roads, color = "light grey", linewidth = 1.5) +
-  geom_sf(aes(color = n), linewidth = 1.5) +
+  geom_sf(aes(color = n), linewidth = 1) +
   viridis::scale_color_viridis(trans = "log") +
   CB::theme_map()
 
-ggsave("crime_incident_map.svg")
+ggsave("crime_incident_map.svg", width = 14, height = 10)
+
+
