@@ -6,7 +6,7 @@ The "x_address" provided by the city is converted to possible street range lines
 
 Below is a map of the total number of crime incidents detected in each street range approximation in Avondale, East Price Hill, and West Price Hill:
 
-![crime_incident_map](https://user-images.githubusercontent.com/104022087/214565758-f71a9123-0f8e-452e-b32c-e73c35ed3bd8.svg)
+![crime_incident_map](https://user-images.githubusercontent.com/104022087/214891725-38ae46aa-3872-485a-bc3f-d6d916d19ad9.svg)
 
 Note that in this dataset, each crime incident record is uniquely identified by `INSTANCEID`, but `INCIDENT_NO` may be mapped to multiple `INSTANCEID`. 
 
