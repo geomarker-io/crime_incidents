@@ -16,10 +16,10 @@ library(lubridate)
 
 download.file(
   "https://data.cincinnati-oh.gov/api/views/k59e-2pvf/rows.csv?accessType=DOWNLOAD",
-  sprintf("data/crime_incidents_rawdata_%s.csv", Sys.Date())
+  sprintf("data/crime_incidents_rawdata.csv")
 )
 
-raw_data <- read_csv(sprintf("data/crime_incidents_rawdata_%s.csv", Sys.Date()),
+raw_data <- read_csv(sprintf("data/crime_incidents_rawdata.csv"),
                      col_types = cols(
                        DATE_REPORTED = col_datetime(format = "%m/%d/%Y %I:%M:%S %p"),
                        DATE_FROM = col_datetime(format = "%m/%d/%Y %I:%M:%S %p"),
@@ -64,9 +64,6 @@ d <- raw_data |>
   distinct(.keep_all = TRUE)  # remove duplicated rows
 dim(d)
 
-saveRDS(d, file=sprintf("data/crime_incidents_codec_categories_%s.rds", Sys.Date()))
-
-
 #===============================================================
 # group individual level data into incident level data
 #===============================================================
@@ -94,7 +91,6 @@ d.by_ins <- d.by_ins |>
   mutate(other = replace_na(other, 0))
 dim(d.by_ins) #353449
 
-saveRDS(d.by_ins, file=sprintf("data/crime_incidents_codec_categories_byIncident_%s.rds", Sys.Date()))
 
 #======================
 #geospacial mapping
@@ -203,7 +199,7 @@ d.by_ins.new <- left_join(d.by_ins, d_address_ranges, by = "address_x")
 d.by_ins.new |>
   select(-x_max, -x_min, -x_name, -n) |>
   rename(date_time = DATE_FROM) |> 
-  saveRDS(file = sprintf("data/crime_incidents_street_ranges_%s.rds", Sys.Date()))
+  saveRDS("data/crime_incidents_street_ranges.rds")
 
 message(
   scales::percent((nrow(d.by_ins.new) - sum(is.na(d.by_ins.new$street_ranges))) / nrow(d.by_ins.new)),
