@@ -15,7 +15,7 @@ d <- read_csv("https://data.cincinnati-oh.gov/api/views/k59e-2pvf/rows.csv?acces
 
 
 
-# write metadata.md
+# write diagnostics.md
 cat("#### Diagnostic Summary\n\n", file = "diagnostics.md", append = FALSE)
 cat(glue::glue("Number of reported incidents on {Sys.Date()}: {nrow(d)}\n\n"), file = "diagnostics.md", append = TRUE)
 cat(glue::glue("{nrow(d |> filter(is.na(ADDRESS_X)))} ({round(nrow(d |> filter(is.na(ADDRESS_X)))/nrow(d)*100)})% incidents with missing address\n\n"), file = "diagnostics.md", append = TRUE)
