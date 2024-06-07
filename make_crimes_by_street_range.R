@@ -36,7 +36,8 @@ d_crime_by_street_range <-
               values_from = n) |> 
   mutate(across(c(property, violent, other), ~replace_na(.x, 0))) |>
   group_by(ADDRESS_X) |>
-  summarize(across(c(violent, property, other), sum))
+  summarize(across(c(violent, property, other), sum)) |>
+  mutate(total = violent + property + other)
 
 # transform city street range (12XX) to tigris street range (1200-1299)
 street_ranges <- make_street_range(d_crime_by_street_range)
@@ -52,7 +53,7 @@ d_crime_by_street_range$street_ranges <-
 sf_crimes_by_street_range <- 
   unnest(d_crime_by_street_range, cols = c(street_ranges)) |>
   filter(!is.na(tlid)) |>
-  group_by(ADDRESS_X, violent, property, other) |>
+  group_by(ADDRESS_X, violent, property, other, total) |>
   summarize(tlid = paste(unique(tlid), collapse = "-"), 
             geometry = st_union(geometry)) |>
   st_as_sf()
@@ -61,16 +62,31 @@ sf_crimes_by_street_range <-
 sf_crimes_by_tigris_street_range <- 
   sf_crimes_by_street_range |>
   group_by(tlid, geometry) |>
-  summarize(across(c(violent, property, other), sum)) |>
+  summarize(across(c(violent, property, other, total), sum)) |>
   st_as_sf()
 
-# sanity check plot
+# visualize
+neigh <-
+  cincy::neigh_cchmc_2020 
+
+the_roads <-
+  tigris::roads(state = "39", county = "061") |>
+  st_transform(st_crs(neigh)) |>
+  st_crop(neigh) |>
+  filter(MTFCC %in% c("S1100", "S1200"))
+
 ggplot(sf_crimes_by_tigris_street_range) +
-  geom_sf(aes(color = violent), linewidth = 1) +
+  geom_sf(aes(linetype = MTFCC), data = the_roads, color = "light grey", linewidth = 1.5) +
+  geom_sf(aes(color = total), linewidth = 1) +
   viridis::scale_color_viridis(trans = "log") +
   CB::theme_map()
 
-st_write(sf_crimes_by_tigris_street_range, "data/n_crimes_by_street_range_2024_06_07.gpkg")
+ggsave("crime_incident_map.svg", width = 14, height = 10)
+
+# write gpkg file 
+st_write(sf_crimes_by_tigris_street_range, 
+         "data/n_crimes_by_street_range_2024_06_07.gpkg", 
+         append = FALSE)
 
 # number streets unmatched
 # number incidents unmatched
