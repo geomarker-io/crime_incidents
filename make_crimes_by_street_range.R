@@ -13,6 +13,13 @@ d <- read_csv("https://data.cincinnati-oh.gov/api/views/k59e-2pvf/rows.csv?acces
                 ADDRESS_X = col_character()
               ))
 
+
+
+# write metadata.md
+cat("#### Diagnostic Summary\n\n", file = "diagnostics.md", append = FALSE)
+cat(glue::glue("Number of reported incidents on {Sys.Date()}: {nrow(d)}\n\n"), file = "diagnostics.md", append = TRUE)
+cat(glue::glue("{nrow(d |> filter(is.na(ADDRESS_X)))} ({round(nrow(d |> filter(is.na(ADDRESS_X)))/nrow(d)*100)})% incidents with missing address\n\n"), file = "diagnostics.md", append = TRUE)
+
 # clean up and match to coarse crime categories
 crime_category <- yaml::read_yaml("data/crime_categories.yaml")
   
@@ -49,6 +56,14 @@ d_crime_by_street_range$street_ranges <-
               query_street_ranges, 
               .progress = "querying street ranges")
 
+cat(glue::glue("\n\n Number of unique street ranges: {nrow(d_crime_by_street_range)}\n\n"), file = "diagnostics.md", append = TRUE)
+
+unmatched <- 
+  unnest(d_crime_by_street_range, cols = c(street_ranges)) |>
+  filter(is.na(tlid))
+
+cat(glue::glue("{nrow(unmatched)} ({round(nrow(unmatched)/nrow(d_crime_by_street_range)*100)})% unmatched street ranges\n\n"), file = "diagnostics.md", append = TRUE)
+
 # reduce to one geometry per city street range
 sf_crimes_by_street_range <- 
   unnest(d_crime_by_street_range, cols = c(street_ranges)) |>
@@ -57,6 +72,10 @@ sf_crimes_by_street_range <-
   summarize(tlid = paste(unique(tlid), collapse = "-"), 
             geometry = st_union(geometry)) |>
   st_as_sf()
+
+cat(glue::glue("{as.double(summarize(unmatched, sum(total)))} ({round(as.double(summarize(unmatched, sum(total)))/as.double(summarize(st_drop_geometry(ungroup(sf_crimes_by_street_range)), sum(total)))*100)})% unmatched incidents\n\n"), file = "diagnostics.md", append = TRUE)
+
+
 
 # collapse tigris street ranges
 sf_crimes_by_tigris_street_range <- 
@@ -87,6 +106,3 @@ ggsave("crime_incident_map.svg", width = 14, height = 10)
 st_write(sf_crimes_by_tigris_street_range, 
          "data/n_crimes_by_street_range_2024_06_07.gpkg", 
          append = FALSE)
-
-# number streets unmatched
-# number incidents unmatched
