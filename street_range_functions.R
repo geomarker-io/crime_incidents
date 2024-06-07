@@ -9,9 +9,9 @@ suffix_replacements <-
 
 make_street_range <- function(d) {
   d |>
-    select(address) |>
+    select(ADDRESS_X) |>
     # separate street numbers from street name
-    separate_wider_regex(cols = address, 
+    separate_wider_regex(cols = ADDRESS_X, 
                          patterns = c(x_min = "^[0-9X]*", x_name = ".*"),
                          cols_remove = FALSE
     ) |>
@@ -28,23 +28,10 @@ make_street_range <- function(d) {
            x_name = str_replace_all(x_name, suffix_replacements),
            x_name = str_replace_all(x_name, fixed("ave ave"), "ave")
     ) |>
-    select(address, x_min, x_max, x_name)
+    select(ADDRESS_X, x_min, x_max, x_name)
 }
 
-# https://www2.census.gov/geo/pdfs/maps-data/data/tiger/tgrshp2020/TGRSHP2020_TechDoc.pdf
-tigris_streets <-
-  tigris::address_ranges(state = "39", county = "061", year = 2021) |>
-  select(tlid = TLID,
-         name = FULLNAME,
-         LFROMHN, RFROMHN,
-         LTOHN, RTOHN) |>
-  mutate(across(ends_with("HN"), as.numeric)) |>
-  dplyr::rowwise() |>
-  transmute(name = str_to_lower(name),
-            tlid = as.character(tlid),
-            number_min = min(LFROMHN, RFROMHN, LTOHN, RTOHN, na.rm = TRUE),
-            number_max = max(LFROMHN, RFROMHN, RTOHN, LTOHN, na.rm = TRUE)) |>
-  ungroup()
+tigris_streets <- readRDS("data/tigris_streets.rds")
 
 # returns all "intersecting" tigris street range address lines within intput street name and min/max for street number
 query_street_ranges <- function(x_name, x_min, x_max, ...) {
