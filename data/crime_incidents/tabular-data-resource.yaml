@@ -1,7 +1,7 @@
 profile: tabular-data-resource
 name: crime_incidents
 path: crime_incidents.csv
-version: 0.1.0
+version: 0.4.0
 title: Crime Incidents
 homepage: https://geomarker.io/crime_incidents
 description: Number of reported crimes by census tract
@@ -11,19 +11,19 @@ schema:
       name: census_tract_id_2020
       type: string
       description: census tract identifier
-    violent:
-      name: violent
+    shotspotter:
+      name: shotspotter
       type: number
-      description: number of violent crimes
+      description: number of gunshots
     property:
       name: property
       type: number
       description: number of property crimes
+    violent:
+      name: violent
+      type: number
+      description: number of violent crimes
     other:
       name: other
       type: number
       description: number of other crimes
-    total:
-      name: total
-      type: number
-      description: sum of violent, property, and other crimes
