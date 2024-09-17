@@ -1,3 +1,5 @@
+**This repository is deprecated in favor of https://github.com/geomarker-io/xx_address**
+
 # Cincinnati Crime Incidents
 
 This R code creates the `crime incidents` data resource. The crime incidents data are downloaded from [PDI (Police Data Initiative) Crime Incidents](https://data.cincinnati-oh.gov/safety/PDI-Police-Data-Initiative-Crime-Incidents/k59e-2pvf), which are updated daily. This data represents reported crime incidents in the City of Cincinnati. Incidents are the records, of reported crimes, collated by an agency for management. Incidents are typically housed in a Records Management System (RMS) that stores agency-wide data about law enforcement operations. This does not include police calls for service, arrest information, final case determination, or any other incident outcome data.
